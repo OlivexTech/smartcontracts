@@ -56,7 +56,7 @@ contract OliveXNode is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
         revert("Transfer not allowed");
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) public pure override(ERC721, IERC721) {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public pure override(ERC721, IERC721) {
         revert("Transfer not allowed");
     }
 
