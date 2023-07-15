@@ -5,11 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
-    using SafeMath for uint256;
-
     uint256 constant DAY_IN_SECONDS = 86400;
 
     uint256 public maxSupply = 1000000000 * 10 ** 6; // max supply 1 billion
