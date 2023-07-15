@@ -5,12 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
+    using SafeMath for uint256;
+
     uint256 constant DAY_IN_SECONDS = 86400;
 
-    uint256 public maxSupply = 1000000000 * 10 ** decimals(); // max supply 1 billion
-    uint256 public minSupply = 21000000 * 10 ** decimals(); // min supply 21 million
+    uint256 public maxSupply = 1000000000 * 10 ** 6; // max supply 1 billion
+    uint256 public minSupply = 21000000 * 10 ** 6; // min supply 21 million
     uint256 public stopDate = 1988150400; // 1 January 2033 00:00:00
 
     struct User {
@@ -40,6 +43,10 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
             whitelist: maxSupply,
             circulate: 0
         });
+    }
+
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
     }
 
     function pause() public onlyOwner {
@@ -106,10 +113,12 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function calcBalance(uint256 amount, uint256 diffDay) public pure returns (uint256) {
-        uint256 calc = 0;
+        uint256 calc = amount;
 
-        if(amount > 1000) {
-            calc = amount * 999 ** diffDay / 1000 ** diffDay;
+        if(calc > 0) {
+            for (uint256 i = 0; i < diffDay; i++) {
+                calc = calc * 999 / 1000;
+            }
         }
 
         return calc;
