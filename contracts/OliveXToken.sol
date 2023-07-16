@@ -9,9 +9,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     uint256 constant DAY_IN_SECONDS = 86400;
 
-    uint256 public maxSupply = 1000000000 * 10 ** 6; // max supply 1 billion
-    uint256 public minSupply = 21000000 * 10 ** 6; // min supply 21 million
-    uint256 public stopDate = 1988150400; // 1 January 2033 00:00:00
+    uint256 public maxSupply = 1000000000 * 10 ** decimals(); // max supply 1 billion
+    uint256 public minSupply = 21000000 * 10 ** decimals(); // min supply 21 million
+    uint256 public stopDate = getDateTime(1988150400); // 1 January 2033 00:00:00
 
 	address private _destroyAddress = address(0x0000000000000000000000000000000000000001);
 
@@ -68,7 +68,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
         whitelist[account] = true;
 
         if(balanceOf(account) > 0) {
-            uint256 diffDay = getDateDiff(getDateTime(block.timestamp), ovePool.time);
+            uint256 diffDay = getDateDiff(ovePool.time);
 
             ovePool.time = getDateTime(block.timestamp);
             ovePool.circulate = calcBalance(ovePool.circulate, diffDay) - balanceMask(account);
@@ -82,7 +82,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
         whitelist[account] = false;
 
         if(balanceOf(account) > 0) {
-            uint256 diffDay = getDateDiff(getDateTime(block.timestamp), ovePool.time);
+            uint256 diffDay = getDateDiff(ovePool.time);
 
             ovePool.time = getDateTime(block.timestamp);
             ovePool.circulate = calcBalance(ovePool.circulate, diffDay) + super.balanceOf(account);
@@ -98,10 +98,12 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function getDateDiff(uint256 start, uint256 end) public view returns (uint256){
+    function getDateDiff(uint256 start) public view returns (uint256){
+        uint256 end = getDateTime(block.timestamp);
+        
         if(end > stopDate) {
             end = stopDate;
-        } else if(start > end) {
+        } else if (start > end) {
             return 0;
         }
 
@@ -154,7 +156,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
 	function updateTotalSupply(address from, address to, uint256 amount) private {
-        uint256 diffDay = getDateDiff(getDateTime(block.timestamp), ovePool.time);
+        uint256 diffDay = getDateDiff(ovePool.time);
         uint256 currentSupply = 0;
 
         ovePool.time = getDateTime(block.timestamp);
@@ -175,7 +177,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function balanceMask(address account) private view returns (uint256) {
-        uint256 diffDay = getDateDiff(getDateTime(block.timestamp), userLast[account].time);
+        uint256 diffDay = getDateDiff(userLast[account].time);
 
         if(super.balanceOf(account) == 0) {
             return 0;
@@ -197,7 +199,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function totalSupply() public view override returns (uint256) {
-        return super.totalSupply() - ovePool.whitelist - super.balanceOf(_destroyAddress);
+        return super.totalSupply() - super.balanceOf(_destroyAddress);
     }
 
 }
