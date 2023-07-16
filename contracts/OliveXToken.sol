@@ -59,7 +59,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     function resetStopDate(uint256 dateTime) public onlyOwner {
 		require(dateTime > block.timestamp, "ERC20: invalid stoptime");
         
-        stopDate = dateTime;
+        stopDate = getDateTime(dateTime);
     }
 
     function addWhitelist(address account) public onlyOwner {
