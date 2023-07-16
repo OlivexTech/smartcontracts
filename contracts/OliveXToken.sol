@@ -199,7 +199,9 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function totalSupply() public view override returns (uint256) {
-        return super.totalSupply() - super.balanceOf(_destroyAddress);
+        uint256 diffDay = getDateDiff(ovePool.time);
+
+        return ovePool.whitelist + calcBalance(ovePool.circulate, diffDay) - super.balanceOf(_destroyAddress);
     }
 
 }
