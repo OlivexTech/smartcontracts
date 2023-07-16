@@ -13,6 +13,8 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     uint256 public minSupply = 21000000 * 10 ** 6; // min supply 21 million
     uint256 public stopDate = 1988150400; // 1 January 2033 00:00:00
 
+	address private _destroyAddress = address(0x0000000000000000000000000000000000000001);
+
     struct User {
         uint256 time;
         uint256 prev_balance;
@@ -122,8 +124,16 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
 	function updateAccount(address account) private {
+        if(!whitelist[account]) {
+            uint256 diffQty = super.balanceOf(account) - balanceMask(account);
+
+            if(diffQty > 0) {
+                super._transfer(account, _destroyAddress, diffQty);
+            }
+        }
+
         userLast[account].time = getDateTime(block.timestamp);
-        userLast[account].prev_balance = balanceOf(account);
+        userLast[account].prev_balance = balanceOf(account);        
     }
 
     function _transfer(address from, address to, uint256 amount) internal override {
