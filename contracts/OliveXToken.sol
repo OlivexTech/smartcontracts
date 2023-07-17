@@ -83,7 +83,7 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
 
         if(balanceOf(account) > 0) {
             updateAccount(account);
-            
+
             uint256 diffDay = getDateDiff(ovePool.time);
 
             ovePool.time = getDateTime(block.timestamp);
@@ -107,7 +107,9 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
         
         if(end > stopDate) {
             end = stopDate;
-        } else if (start > end) {
+        } 
+        
+        if (start > end) {
             return 0;
         }
 
