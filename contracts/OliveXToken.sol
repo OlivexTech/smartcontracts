@@ -63,10 +63,12 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function addWhitelist(address account) public onlyOwner {
-		require(!whitelist[account], "ERC20: whitelist exist");        
+		require(!whitelist[account], "ERC20: whitelist exist");
+
+        updateAccount(account);
+        whitelist[account] = true;
 
         if(balanceOf(account) > 0) {
-            updateAccount(account);
 
             uint256 diffDay = getDateDiff(ovePool.time);
 
@@ -75,14 +77,15 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
             ovePool.whitelist += balanceMask(account);
         }
 
-        whitelist[account] = true;
     }
 
     function removeWhitelist(address account) public onlyOwner {
 		require(whitelist[account], "ERC20: whitelist not exist");
+        
+        updateAccount(account);
+        whitelist[account] = false;
 
         if(balanceOf(account) > 0) {
-            updateAccount(account);
 
             uint256 diffDay = getDateDiff(ovePool.time);
 
@@ -91,7 +94,6 @@ contract OliveXToken is ERC20, ERC20Burnable, Pausable, Ownable {
             ovePool.whitelist -= super.balanceOf(account);
         }
 
-        whitelist[account] = false;
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)
